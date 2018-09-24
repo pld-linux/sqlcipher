@@ -10,13 +10,13 @@
 Summary:	SQLCipher library - SQLite extension that provides AES encryption
 Summary(pl.UTF-8):	Biblioteka SQLCipher - rozszerzenie SQLite zapewniające szyfrowanie AES
 Name:		sqlcipher
-Version:	3.4.0
-Release:	2
+Version:	3.4.2
+Release:	1
 License:	BSD
 Group:		Libraries
 # Source0Download: https://github.com/sqlcipher/sqlcipher/releases
 Source0:	https://github.com/sqlcipher/sqlcipher/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	2225da8fc163f78b5fffd0bcf8b28695
+# Source0-md5:	b224b7a3a1927d2e6344ae6e27308c8c
 URL:		https://www.zetetic.net/sqlcipher/
 %{?with_load_extension:Provides:	%{name}(load_extension)}
 %{?with_unlock_notify:Provides:	%{name}(unlock_notify)}
