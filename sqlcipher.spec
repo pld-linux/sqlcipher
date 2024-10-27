@@ -10,26 +10,27 @@
 Summary:	SQLCipher library - SQLite extension that provides AES encryption
 Summary(pl.UTF-8):	Biblioteka SQLCipher - rozszerzenie SQLite zapewniające szyfrowanie AES
 Name:		sqlcipher
-Version:	3.4.2
-Release:	2
+Version:	4.6.1
+Release:	1
 License:	BSD
 Group:		Libraries
 # Source0Download: https://github.com/sqlcipher/sqlcipher/releases
 Source0:	https://github.com/sqlcipher/sqlcipher/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	b224b7a3a1927d2e6344ae6e27308c8c
+# Source0-md5:	2651f450cc41fdb9d853770da0f2d96a
 URL:		https://www.zetetic.net/sqlcipher/
 %{?with_load_extension:Provides:	%{name}(load_extension)}
 %{?with_unlock_notify:Provides:	%{name}(unlock_notify)}
 %{?with_icu:Provides:	%{name}(icu)}
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
-BuildRequires:	libtool
+BuildRequires:	libedit-devel
+BuildRequires:	libtool >= 2:2
 BuildRequires:	openssl-devel
-BuildRequires:	readline-devel
 %{?with_load_extension:BuildRequires:	sed >= 4.0}
 BuildRequires:	tcl
 %{?with_tcl:BuildRequires:	tcl-devel >= %{tclver}}
 BuildRequires:	unzip
+BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_ulibdir	/usr/lib
@@ -133,12 +134,8 @@ append-cppflags -DSQLITE_ENABLE_COLUMN_METADATA
 
 # Support Full-Text Search versions 3 and 4.
 # http://sqlite.org/fts3.html
-#append-cppflags -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_FTS4 -DSQLITE_ENABLE_FTS4_UNICODE61
+#append-cppflags -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_FTS4
 append-cppflags -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS
-
-# Support R*Trees.
-# http://sqlite.org/rtree.html
-append-cppflags -DSQLITE_ENABLE_RTREE
 
 # Support soundex() function.
 # http://sqlite.org/lang_corefunc.html#soundex
@@ -159,15 +156,20 @@ append-cppflags -DSQLITE_ENABLE_ICU
 append-libs "-licui18n -licuuc"
 %endif
 
-%if %{with load_extension}
-append-libs "-ldl"
-%endif
-
 %configure \
 	%{!?with_tcl:--disable-tcl}%{?with_tcl:--with-tcl=%{_ulibdir}} \
 	%{__enable_disable load_extension load-extension} \
+	--enable-rtree \
 	--enable-tempstore \
 	--enable-threadsafe
+# TODO - think about:
+# --enable-fts3  enabled by -D
+# --enable-fts4
+# --enable-fts5
+# --enable-memsys5 or --enable-memsys3
+# --enable-geopoly
+# --enable-session
+# --enable-update-limit
 
 %{__make}
 
@@ -193,7 +195,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc CHANGELOG.md LICENSE README.md
+%doc CHANGELOG.md LICENSE.md README.md
 %attr(755,root,root) %{_bindir}/sqlcipher
 %attr(755,root,root) %{_libdir}/libsqlcipher.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libsqlcipher.so.0
